@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+        <form onsubmit="savetoLocal(event)">
+        <h1>Add User</h1>
+          <div>
+          <label>Name:</label>
+          <input type="text" name="username" id = "usernameInputTag" required>
+          </div>
+        
+          <div>
+          <label>Email:</label>
+          <input type="email" name="emailId" id = "emailInputTag" required>
+          </div>
+          
+          <div>
+          <label>Phone Number:</label>
+          <input type="tel" name="phonenumber"  id = "phonenumberInputTag" required>
+          </div>
+        <button value="Submit">submit</button>
+      </form>
+      
+
+      <ul id="ListOfitems">
+        
+      </ul> 
+      
+      <script src = "https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js"></script>
+      <script>
+        function savetoLocal(event){
+            event.preventDefault();
+            let name = event.target.username.value;
+            let email = event.target.emailId.value;
+            let number = event.target.phonenumber.value;
+            
+            // localStorage.setItem('name', name);
+            // localStorage.setItem('email', email);
+            // localStorage.setItem('Number', number);
+
+            const obj = {
+                name : name,
+                emailId : email,
+                number : number
+            }
+            axios.post('https://crudcrud.com/api/7a9175536c2d4f73b25a62c9063d4547/appointmentData',obj)
+            .then((response) => {
+                showUserOnScreen(response.data);
+                console.log(response);
+            })
+            .catch((err) => {
+                console.log(error);
+            })
+            //localStorage.setItem('userdetails', JSON.stringify(obj));
+            //showUserOnScreen(obj);
+        }
+        window.addEventListener("DOMContentLoaded", ()=>{
+            axios.get('https://crudcrud.com/api/7a9175536c2d4f73b25a62c9063d4547/appointmentdata')
+            .then((response) => {
+                console.log(response);
+                for(var i = 0; i<response.data.length; i++){
+                    showUserOnScreen(response.data[i]);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+        })
+
+        function showUserOnScreen(obj){
+            //one way doing this--->
+            // const parentEle = document.getElementById('ListOfitems');
+            // parentEle.innerHTML = `<li>${obj.name} - ${obj.emailId} - ${obj.number}</li>`;
+
+            //another way---->
+            const parentEle = document.getElementById('ListOfitems');
+            const childEle = document.createElement('li');
+            childEle.textContent = obj.name + " - " + obj.emailId + " - " + obj.number;
+
+            const delButton = document.createElement('input');
+            delButton.type = 'button';
+            delButton.value = 'Delete';
+
+            const editButton = document.createElement('input');
+            editButton.type = 'button';
+            editButton.value = 'Edit';
+
+            delButton.onclick = () => {
+                localStorage.removeItem('userdetails');
+                parentEle.removeChild(childEle);
+            }
+            editButton.onclick = () => {
+                localStorage.removeItem('userdetails');
+                parentEle.removeChild(childEle);
+                let name = document.getElementById('usernameInputTag');
+                name.value = obj.name;
+                let email = document.getElementById('emailInputTag');
+                email.value = obj.emailId;
+                let number = document.getElementById('phonenumberInputTag');
+                number.value = obj.number;
+            }
+
+            childEle.appendChild(delButton);
+            childEle.appendChild(editButton);
+
+            parentEle.appendChild(childEle);
+        }
+            
+    </script>
+</body>
+</html>
